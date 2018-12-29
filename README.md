@@ -40,7 +40,7 @@ I had also expected that formatting would be a recursive operation, but that ide
 
 So, the concept is nothing more than reading from start to end and keeping track of context along the way.
 
-This implementation uses two passes: first to remove any existing formatting, and then to apply the desired formatting; and instead of working through the statement one character at a time, we grab white-space delimited elements and go from there.
+This implementation uses two passes: first to remove any existing formatting, then to apply the desired formatting; and instead of working through the statement one character at a time, we grab white-space delimited elements and go from there.
 
 It's not clear to me how comments can be addressed in any helpful way and they generally require cleanup in the formatted result.
 
