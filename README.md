@@ -30,7 +30,7 @@ where a.expired <> 0
 
 ## Overview
 
-It turns out that parsing a SQL statement for formatting can be a rather tricky; comments and dynamic SQL especially so.  
+It turns out that parsing a SQL statement for formatting can be tricky; comments and dynamic SQL especially so.  
 
 At one point I thought to simplify things by removing comments and quoted values entirely, restoring them after formatting was complete.
 
