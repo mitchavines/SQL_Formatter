@@ -1,12 +1,14 @@
 # SQL_Formatter
 
-C# SQL statement formatter class.  
+C# SQL statement formatter class  
 
 ## Example
+<pre>
 update a set a.ID = b.ID, Name = b.Name from Table1 a 
 inner join (select ID, Name from Table2 where Active <> 0 and Current <> 0)  b 
 on a.ownerid = b.ownerid and a.type = b.type and b.version = '87.1' 
 and a.Name is Null where a.expired <> 0
+</pre>
 
 becomes
 
