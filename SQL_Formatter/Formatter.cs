@@ -152,7 +152,7 @@ namespace SQL_Formatter
 
             // Force title case for common SQL functions
             string[] sqlFunctions = { "Min", "Max", "Sum", "Count",
-                "CharIndex", "Upper", "Lower", "Replace",
+                "CharIndex", "Upper", "Lower", "Replace", "Len", "Left", "Right", "RTrim", "LTrim", "Substring", 
                 "GetDate", "DateAdd", "DateDiff", "DatePart", "Year", "Month", "Day", "Hour", "Minute", "Second",
                 "IsNull", "Coalesce", "Cast", "Convert" };
 
