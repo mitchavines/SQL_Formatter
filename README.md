@@ -48,9 +48,9 @@ It's not clear to me how comments can be addressed in any helpful way and they g
 The solution includes a simple winforms demo executable along with the Formatter class.  The implementation of the formatter employs a number of routines from unrelated libraried code; I've pulled these fragments into an additional file: LIB.cs.
 
 ## Feedback
-I learned a fair bit getting this implementation to its current state and I'm sharing it here hoping it might prove useful to others--but also to solicit comments on the approach.  Is there a better, more formal method I'm missing?
+I'd be very interested in thoughts regarding the approach... is there a better, more formal method I'm missing?
 
-I've informally tested this solution against a sample of 500+ statements, but these were all written by just a few developers so the test cases may be less diverse than the number might suggest.  Also, the intention is to support any SQL dialect but there is a significant bias towards T-SQL.  
+I've tested this solution against a sample of 500+ statements, but these were all written by just a few developers so the test cases may be less diverse than hoped.  Also, the intention is to support any SQL dialect but there is a significant bias towards T-SQL.  
 
 Any thoughts regarding defects, changes required to support other dialects, support for formatting options, etc. are much appreciated.
 
