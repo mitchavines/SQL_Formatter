@@ -28,22 +28,6 @@ from Table1 a
 where a.expired <> 0
 </pre>
 
-## Overview
-
-It turns out that parsing a SQL statement for formatting can be tricky; comments and dynamic SQL especially so.  
-
-At one point I thought to simplify things by removing comments and quoted values entirely, restoring them after formatting was complete.
-
-Of course it doesn't work like that.  An apostrophe preceded by -- is part of a comment, but -- preceded by an apostrophe is a literal value... there's nothing like operator precedence to help, and no getting around parsing from beginning to end.
-
-I had also expected that formatting would be a recursive operation, but that idea foundered on identifying the end of a statement.
-
-So, the concept is nothing more than reading from start to end and keeping track of context along the way.
-
-This implementation uses two passes: first to remove any existing formatting, then to apply the desired formatting; and instead of working through the statement one character at a time, we grab white-space delimited elements and go from there.
-
-It's not clear to me how comments can be addressed in any helpful way and they generally require cleanup in the formatted result.
-
 ## The source
 The solution includes a simple winforms demo executable along with the Formatter class.  The implementation of the formatter employs a number of routines from unrelated libraried code; I've pulled these fragments into an additional file: LIB.cs.
 
