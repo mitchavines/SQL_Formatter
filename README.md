@@ -31,10 +31,4 @@ where a.expired <> 0
 ## The source
 The solution includes a simple winforms demo executable along with the Formatter class.  The implementation of the formatter employs a number of routines from unrelated libraried code; I've pulled these fragments into an additional file: LIB.cs.
 
-## Feedback
-I'd be very interested in thoughts regarding the approach... is there a better, more formal method I'm missing?
-
-I've tested this solution against a sample of 500+ statements, but these were all written by just a few developers so the test cases may be less diverse than hoped.  Also, the intention is to support any SQL dialect but there is currently a significant bias towards T-SQL.
-
-Any thoughts regarding defects, changes required to support other dialects, support for formatting options, etc. would be much appreciated.
 
