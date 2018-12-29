@@ -43,7 +43,7 @@ This implementation uses two passes: first to remove any existing formatting, an
 It's not clear to me how comments can be addressed in any helpful way and they generally require cleanup in the formatted result.
 
 ## The source
-The solution includes a simple winforms demo executable along with the Formatter class.  The implementation of the formatter employs a number of routines from unrelated libraried code, I've pulled these fragments into an additional file LIB.cs.
+The solution includes a simple winforms demo executable along with the Formatter class.  The implementation of the formatter employs a number of routines from unrelated libraried code; I've pulled these fragments into an additional file: LIB.cs.
 
 ## Feedback
 I learned a fair bit getting this implementation to its current state and I'm sharing it here hoping it might prove useful to others--but also to solicit comments on the approach.  Is there a better, more formal method I'm missing?
