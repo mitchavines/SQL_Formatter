@@ -32,7 +32,7 @@ It turns out that parsing a SQL statement for formatting can be a rather tricky;
 
 At one point I thought to simplify things by removing comments and quoted values entirely, restoring them after formatting was complete.
 
-Of course it doesn't work that way.  An apostrophe preceded by -- is part of a comment, but -- preceded by an apostrophe is a literal value... there's nothing like operator precedence to help, and no getting around parsing from beginning to end.
+Of course it doesn't work like that.  An apostrophe preceded by -- is part of a comment, but -- preceded by an apostrophe is a literal value... there's nothing like operator precedence to help, and no getting around parsing from beginning to end.
 
 I had also expected that formatting would be a recursive operation, but that idea foundered on identifying the end of a statement.
 
