@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.28307.168
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SQL_Formatter", "SQL_Formatter\SQL_Formatter.csproj", "{A9D0F634-899A-41FB-AA38-751E9DE9F4FB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Demo", "Demo\Demo.csproj", "{C995D8CA-80D8-45B0-9BF3-922B3F13C8E9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{A9D0F634-899A-41FB-AA38-751E9DE9F4FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A9D0F634-899A-41FB-AA38-751E9DE9F4FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A9D0F634-899A-41FB-AA38-751E9DE9F4FB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C995D8CA-80D8-45B0-9BF3-922B3F13C8E9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C995D8CA-80D8-45B0-9BF3-922B3F13C8E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C995D8CA-80D8-45B0-9BF3-922B3F13C8E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C995D8CA-80D8-45B0-9BF3-922B3F13C8E9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
