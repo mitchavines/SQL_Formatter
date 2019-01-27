@@ -787,4 +787,27 @@ namespace SQL_Formatter
 
     } // Time
 
+    public static class KVP
+    {
+        public class List
+        {
+            private string list = null;
+
+            public List(string value)
+            {
+                list = (value ?? "").ToLower();
+                while (list.Contains(new string[] { " =", "= " }))
+                    list = list.Replace(" =", "=").Replace("= ", "=");
+            }
+
+            public bool GetBoolean(string value, Boolean? defaultValue = null)
+            {
+                value = value.ToLower();
+                if (list.Contains(value))
+                    return list.Contains($"{value}=true");
+                else
+                    return defaultValue ?? false;
+            }
+        }
+    } // KVP
 }

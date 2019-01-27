@@ -24,9 +24,10 @@ namespace Demo
         }
 
         private void cmdFormat_Click(object sender, EventArgs e)
-        { txtFormatted.Text = formatter.Format(txtSource.Text); }
+        { txtFormatted.Text = formatter.Format(txtSource.Text, txtOptions.Text); }
 
         private void txtExit_Click(object sender, EventArgs e)
         { Close(); }
+
     }
 }

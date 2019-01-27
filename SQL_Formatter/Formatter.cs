@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 
 namespace SQL_Formatter
@@ -87,10 +88,13 @@ namespace SQL_Formatter
                     continue;
                 }
 
+                if (ch.In(new string[] { "\r", "\n", "\t" }))
+                        ch = " ";
+
                 switch (ch)
                 {
                     case " ":           // Collapse whitespace
-                        if (result.Right(1).In(" (")) ch = "";
+                        if (result.Right(1).In(new string[] { "(", " " })) ch = "";
                         break;
 
                     case "(":           // Force leading spaces
@@ -112,47 +116,50 @@ namespace SQL_Formatter
                         if (index < str.Length - 2 && ch != "<" | str.Substring(index + 1, 1) != ">")
                             if (!result.Right(1).In(" ><")) ch = " " + ch + " ";
                         break;
-
-                    case "\r":
-                    case "\n":
-                    case "\t":
-                        ch = " ";
-                        break;
                 }
                 result.Append(ch);
                 index++;
             }
 
+            // Force comments and literals to be recognized as discrete tokens
+            result = result.Replace("--", " --");
+            result = result.Replace("/*", " /*");
+
             return result.ToString();
         }
 
         /// <summary>
-        /// A simple-minded SQL formatter
+        /// A simple SQL formatter
         /// </summary>
         /// <remarks>
         /// On failure, sets the Success property to false and the LastResult property to an informational message.
         /// This allows the calling code to consume or ignore the result appropriately and use LastResult in an error message.
         /// </remarks>
-        /// <param name="statement"></param>
-        /// <param name="tab"></param>
+        /// <param name="sql"></param>
+        /// <param name="options">
+        ///     LeadingCommas, Boolean = false
+        ///     LeadingJoins, Boolean = true
+        ///     RemoveComments, Boolean = false
+        /// </param>
         /// <returns>
         /// The formatted statement
         /// </returns>
-        public string Format(string sql)
+        public string Format(string sql, string options = null)
         {
-            string token = null;                                // A syntactic element extracted from the statement
-            int stmtIndex = 0;                                  // Position in the statement being parsed
-            int tknIndex = 0;                                   // Position in a single token being parsed
+            string token = null;                                        // A syntactic element extracted from the statement
+            int stmtIndex = 0;                                          // Position in the statement being parsed
+            int tknIndex = 0;                                           // Position in a single token being parsed
             int tmpIndex = 0;
-            string previousToken = "";                          // Track multi-part tokens
-            int currentParens = -1;                             // Current depth of parentheses nesting
+            string previousToken = "";                                  // Track multi-part tokens
+            int currentParens = -1;                                     // Current depth of parentheses nesting
             int cte = -1;
-            List<string> currentKeyword = new List<string>() { "" };   // The SQL keyword being parsed at each level
+            List<string> currentKeyword = new List<string>() { "" };    // The SQL keyword being parsed at each level
             DateTime startTime = DateTime.Now;
+            var args = new KVP.List(options);
 
             // Force title case for common SQL functions
             string[] sqlFunctions = { "Min", "Max", "Sum", "Count",
-                "CharIndex", "Upper", "Lower", "Replace", "Len", "Left", "Right", "RTrim", "LTrim", "Substring", 
+                "CharIndex", "Upper", "Lower", "Replace", "Len", "Left", "Right", "RTrim", "LTrim", "Substring",
                 "GetDate", "DateAdd", "DateDiff", "DatePart", "Year", "Month", "Day", "Hour", "Minute", "Second",
                 "IsNull", "Coalesce", "Cast", "Convert" };
 
@@ -169,14 +176,10 @@ namespace SQL_Formatter
             catch (Exception ex)
             { return Fail(ex.Message); }
 
-            // Force comments and literals to be recognized as discrete tokens
-            sql = sql.Replace("--", " --");
-            sql = sql.Replace("/*", " /*");
-
             // Parse the statement 
             while (stmtIndex < sql.Length)
             {
-                //  Skip spaces
+                //  Skip leading spaces
                 while (stmtIndex < sql.Length && sql.Substring(stmtIndex, 1) == " ")
                     stmtIndex++;
 
@@ -191,7 +194,8 @@ namespace SQL_Formatter
                     tknIndex = sql.IndexOf("\r\n", stmtIndex) + 2;
                     if (tknIndex < stmtIndex)
                         tknIndex = sql.Length;
-                    result.Append(sql.Substring(stmtIndex, tknIndex - stmtIndex));
+                    if (!args.GetBoolean("RemoveComments", false))
+                        result.Append(sql.Substring(stmtIndex, tknIndex - stmtIndex));
                     stmtIndex = tknIndex;
                     continue;
                 }
@@ -199,7 +203,8 @@ namespace SQL_Formatter
                 if (token.StartsWith("/*"))
                 {
                     tknIndex = sql.IndexOf("*/", stmtIndex) + 2;
-                    result.Append(sql.Substring(stmtIndex, tknIndex - stmtIndex));
+                    if (!args.GetBoolean("RemoveComments", false))
+                        result.Append(sql.Substring(stmtIndex, tknIndex - stmtIndex));
                     stmtIndex = tknIndex;
                     continue;
                 }
@@ -259,6 +264,7 @@ namespace SQL_Formatter
                 }
 
                 stmtIndex = stmtIndex + token.Length;
+                Debug.Print(token);
 
                 // Multi-part keywords
                 switch (token.ToLower())
@@ -297,14 +303,18 @@ namespace SQL_Formatter
                 {
                     case "select":
                         // Begin a select statement
-                        // Pushes occur below, see Tab_Level
+                        // Pushes occur below, see tabLevel
                         if (cte == tabLevel)
                         {
-                            // Keep together
+                            // Keep together--prevent the default vertical whitespace
                             token = Tabs(true) + token.ToLower();
                             cte = -1;
                         }
-                        else if (currentKeyword[tabLevel].Equals("if"))
+                        else if (currentKeyword[tabLevel] == "")
+                            // New statement
+                            token = Tabs() + token.ToLower();
+                        else if (currentKeyword[tabLevel] == "if")
+                            // SQL conditional
                             token = Tabs(true) + "\t" + token.ToLower();
                         else if (!currentKeyword[tabLevel].In(new string[] { "select", "insert", "insert into", "if" }))
                             // Force vertical whitespace
@@ -327,7 +337,7 @@ namespace SQL_Formatter
                     case "for":
                     case "into":
                     case "over":
-                        // CTE ?
+                        // CTE
                         if (token.ToLower() == "with")
                             cte = tabLevel;
 
@@ -353,11 +363,21 @@ namespace SQL_Formatter
 
                     case "and":
                     case "or":
-                        // Wrap where clause conditions
-                        if (currentKeyword[tabLevel] == "where")
-                            token = Tabs(true) + "\t" + token.ToLower();
+                        // Wrap where clause and join conditions
+                        if (args.GetBoolean("LeadingCommas", false))
+                        {
+                            if (currentKeyword[tabLevel] == "where")
+                                token = token.ToLower() + Tabs(true) + "\t";
+                            else
+                                token = token.ToLower();
+                        }
                         else
-                            token = token.ToLower();
+                        {
+                            if (currentKeyword[tabLevel] == "where")
+                                token = Tabs(true) + "\t" + token.ToLower();
+                            else
+                                token = token.ToLower();
+                        }
                         break;
 
                     case "case":
@@ -516,7 +536,10 @@ namespace SQL_Formatter
                     case "cross apply":
                     case "outer apply":
                         // New, indented line
-                        token = Tabs(true) + "\t" + token.ToLower();
+                        if (args.GetBoolean("LeadingJoins", true))
+                            token = Tabs(true) + "\t" + token.ToLower();
+                        else
+                            token = token.ToLower() + Tabs(true) + "\t";
                         break;
 
                     case "values":
@@ -583,7 +606,15 @@ namespace SQL_Formatter
 
                 // Wrap select and set clauses
                 if (currentKeyword[tabLevel].In(new string[] { "select", "set" }, Str.IgnoreCase) & parenLevel == tabLevel & token.Right(1) == ",")
-                    token += Str.NewLine + Tabs() + "\t";
+                {
+                    if (args.GetBoolean("LeadingCommas", false))
+                    {
+                        token = token.Left(-1);
+                        token += Str.NewLine + Tabs() + "\t,";
+                    }
+                    else
+                        token += Str.NewLine + Tabs() + "\t";
+                }
 
                 // Collapse whitespace
                 if (token.Right(2) != Str.NewLine
@@ -609,6 +640,7 @@ namespace SQL_Formatter
                     token = token + Str.NewLine;
                 }
 
+                //Debug.Print(token);
                 result.Append(token);
             }
 
@@ -626,7 +658,7 @@ namespace SQL_Formatter
 
 #if DEBUG
             result.Insert(0, "/*\r\n" +
-                "Formatted -- https://github.com/mitchavines/SQL_Formatter \r\n" +
+                "Formatted -- https://www.codeproject.com/Articles/1275363/Csharp-Source-for-SQL-Formatting \r\n" +
                 $"{"Length:".PadRight(10)}{sql.Length.ToString("#,###.#")}\r\n" +
                 $"{"Elapsed:".PadRight(10)}{Time.Elapsed(Time.ElapsedUnit.Millisecond, DateTime.Now - startTime)}\r\n" +
                 "*/\r\n\r\n");
@@ -790,7 +822,7 @@ namespace SQL_Formatter
         /// <returns></returns>
         private string Tabs(bool newline = false, int maxnewlines = 2)
         {
-            int Indent = tabLevel + procLevel;
+            int Indent = tabLevel + procLevel + caseLevel;
 
             return (newline & result.gtr("") & result.Right(maxnewlines * 2) != Str.Repeat(Str.NewLine, maxnewlines) ? Str.NewLine : "") + Str.Repeat("\t", Indent);
         }
